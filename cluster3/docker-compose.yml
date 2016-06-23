@@ -1,0 +1,89 @@
+version: '2'
+services:
+
+  #replica set 1
+  rs1_srv1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs1/s1:/data/db
+    ports:
+      - "127.0.0.1:8001:27017"
+        
+  rs1_srv2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs1/s2:/data/db
+      
+  rs1_srv3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs1/s3:/data/db
+        
+  #replica set 2
+  rs2_srv1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs2" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs2/s1:/data/db
+    ports:
+      - "127.0.0.1:8011:27017"
+        
+  rs2_srv2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs2" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs2/s2:/data/db
+      
+  rs2_srv3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs2" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/rs2/s3:/data/db
+
+  #config
+  configsvr1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/cfg/s1:/data/db
+    
+  configsvr2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/cfg/s2:/data/db
+
+  configsvr3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/cfg/s3:/data/db
+
+  #routes
+  router1:
+    image: mongo:3.2
+    ports:
+      - "127.0.0.1:27017:27017"
+    command: mongos --configdb configReplSet/configsvr1:27017,configsvr2:27017,configsvr3:27017 --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    
+  router2:
+    image: mongo:3.2
+    ports:
+      - "127.0.0.1:27018:27017"
+    command: mongos --configdb configReplSet/configsvr1:27017,configsvr2:27017,configsvr3:27017 --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro

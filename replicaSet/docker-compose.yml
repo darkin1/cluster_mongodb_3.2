@@ -1,0 +1,36 @@
+version: '2'
+services:
+
+  rs1_srv1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 25k
+    ports:
+      - "127.0.0.1:8001:27017"
+        
+  rs1_srv2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:8002:27017"
+    logging:
+      options:
+        max-size: 25k
+      
+  rs1_srv3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:8003:27017"
+    logging:
+      options:
+        max-size: 25k
+    

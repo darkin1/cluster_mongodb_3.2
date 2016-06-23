@@ -1,0 +1,69 @@
+version: '2'
+services:
+
+  rs1_srv1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 25k
+    ports:
+      - "127.0.0.1:8001:27017"
+        
+  rs1_srv2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:8002:27017"
+    logging:
+      options:
+        max-size: 25k
+      
+  rs1_srv3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --replSet "rs1" --noprealloc --smallfiles --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:8003:27017"
+    logging:
+      options:
+        max-size: 25k
+
+  configsvr1:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    
+  configsvr2:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  configsvr3:
+    image: mongo:3.2
+    command: mongod --dbpath /data/db --configsvr --replSet configReplSet --port 27017 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  router1:
+    image: mongo:3.2
+    ports:
+      - "127.0.0.1:27017:27017"
+    command: mongos --configdb configReplSet/configsvr1:27017,configsvr2:27017,configsvr3:27017 --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    
+  router2:
+    image: mongo:3.2
+    ports:
+      - "127.0.0.1:27018:27017"
+    command: mongos --configdb configReplSet/configsvr1:27017,configsvr2:27017,configsvr3:27017 --port 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro

@@ -1,0 +1,1 @@
+docker rm mongodb_router1_1 mongodb_router2_1 mongodb_configsvr3_1 mongodb_configsvr2_1 mongodb_configsvr1_1 mongodb_rs1_srv1_1 mongodb_rs1_srv2_1 mongodb_rs1_srv3_1
